@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour {
+  public float movementSpeed = 0.0001f;
   public float cameraSensitivity = 0.001f;
   private Movement movement;
     
@@ -22,7 +23,7 @@ public class PlayerMovement : MonoBehaviour {
 		Quaternion deltaRotation = Quaternion.Euler(0f, rotationInput.x * cameraSensitivity, 0f);
 		//Quaternion deltaRotation = Quaternion.Euler(rotationInput.y * 0.001f, 0f, 0f);
 
-		this.transform.position += deltaPosition * 0.001f;
+		this.transform.position += deltaPosition * movementSpeed;
 		this.transform.rotation *= deltaRotation;
   }
 }
