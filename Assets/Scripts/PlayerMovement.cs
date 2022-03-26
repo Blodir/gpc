@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour {
   }
 
   private void Update() {
-    Vector2 movementInput = movement.Player.move.ReadValue<Vector2>() / Time.deltaTime;
+    Vector2 movementInput = movement.Player.move.ReadValue<Vector2>().normalized / Time.deltaTime;
 		Vector2 rotationInput = movement.Player.look.ReadValue<Vector2>() / Time.deltaTime;
 
 		Vector3 deltaPosition = new Vector3(movementInput.x, 0f, movementInput.y);
