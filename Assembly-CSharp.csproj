@@ -36,8 +36,10 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\NetworkTest2\Player2.cs" />
      <Compile Include="Assets\Scripts\CameraControl.cs" />
      <Compile Include="Assets\Scripts\NetworkTest\Player.cs" />
+     <Compile Include="Assets\Scripts\NetworkTest2\Manager2.cs" />
      <Compile Include="Assets\Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\Scripts\NetworkTest\Manager.cs" />
      <Compile Include="Assets\Scripts\Movement.cs" />
