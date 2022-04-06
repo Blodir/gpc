@@ -1,13 +1,13 @@
 .vscode
 .vs/
 
-/Logs
-/Temp
-/Library
-/obj
-/build
-/user
-/UserSettings
+/[Ll]ogs/
+/[Tt]emp/
+/[Ll]ibrary/
+/[Oo]bj/
+/[Bb]uild/
+/[Uu]ser/
+/[Uu]ser[Ss]ettings/
 
 *.csproj
 *.unityproj

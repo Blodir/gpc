@@ -32,13 +32,13 @@ public partial class @Movement : IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""c48baf6d-7015-4ea6-96de-3e3b82ee7cc2"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
+                    ""processors"": ""NormalizeVector2"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },
                 {
                     ""name"": ""look"",
-                    ""type"": ""Value"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""2b0e5317-cea3-473e-a7d2-c8c27674031a"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
