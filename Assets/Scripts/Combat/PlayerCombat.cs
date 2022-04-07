@@ -9,6 +9,8 @@ public class PlayerCombat : MonoBehaviour, PlayerInput.ICombatActions
   private Animator animator;
   [SerializeField]
   private float attackSpeed = 1f;
+  [SerializeField]
+  private float damage = 35f;
   private PlayerInput controls;
 
   public void OnEnable()
@@ -21,11 +23,6 @@ public class PlayerCombat : MonoBehaviour, PlayerInput.ICombatActions
     controls.combat.Enable();
   }
 
-  void Update()
-  {
-    
-  }
-
   public void OnAttack(InputAction.CallbackContext context)
   {
     if (context.phase == InputActionPhase.Started)
@@ -35,4 +32,12 @@ public class PlayerCombat : MonoBehaviour, PlayerInput.ICombatActions
     }
   }
 
+  public void OnTriggerEnter(Collider col)
+  {
+    HealthManager hmgr = col.gameObject.GetComponent<HealthManager>();
+    if (hmgr != null)
+    {
+      hmgr.TakeDamage(damage);
+    }
+  }
 }
