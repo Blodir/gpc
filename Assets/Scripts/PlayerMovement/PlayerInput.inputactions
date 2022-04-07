@@ -1,8 +1,8 @@
 {
-    "name": "Movement",
+    "name": "PlayerInput",
     "maps": [
         {
-            "name": "Player",
+            "name": "movement",
             "id": "0f9fce35-e3ca-44bb-8b51-f71d8af46aca",
             "actions": [
                 {
@@ -88,6 +88,34 @@
                     "processors": "",
                     "groups": "",
                     "action": "look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "combat",
+            "id": "8c53ab85-ac6c-407c-8c8c-dcfb4c499965",
+            "actions": [
+                {
+                    "name": "attack",
+                    "type": "Button",
+                    "id": "9671f31d-918d-4a52-96fe-32e6b3aaafef",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "91fbbb18-f5f6-4d9f-a5f7-3abddb581ff5",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

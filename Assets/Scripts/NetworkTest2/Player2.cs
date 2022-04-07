@@ -10,14 +10,14 @@ namespace NetworkTest
             NetworkVariableReadPermission.OwnerOnly
         );
         public readonly float movementSpeed = 1f; 
-        private Movement movement;
+        private PlayerInput controls;
 
         private void Awake() {
-            movement = new Movement();
+            controls = new PlayerInput();
         }
 
         private void OnEnable() {
-            movement.Enable();
+            controls.Enable();
         }
 
         public override void OnNetworkSpawn()
@@ -37,7 +37,7 @@ namespace NetworkTest
 
         [ServerRpc]
         void MovementServerRpc(Vector2 v) {
-            movementInput.Value = movement.Player.move.ReadValue<Vector2>();
+            movementInput.Value = controls.movement.move.ReadValue<Vector2>();
         }
 
         void Update()
@@ -48,7 +48,7 @@ namespace NetworkTest
                 position.Value += new Vector3(mvt.x, 0, mvt.y);
             }
             if (NetworkManager.Singleton.IsClient) {
-                MovementServerRpc(movement.Player.move.ReadValue<Vector2>());
+                MovementServerRpc(controls.movement.move.ReadValue<Vector2>());
             }
 
             transform.position = position.Value;

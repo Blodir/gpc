@@ -45,7 +45,7 @@ public class PlayerMove : MonoBehaviour {
     Vector3 newDirection = new Vector3(MovementManager.Instance.moveX, 0, MovementManager.Instance.moveZ);
     direction += newDirection;
     Quaternion rotateToDirection = Quaternion.LookRotation(direction);
-    Quaternion rotate = Quaternion.Lerp(transform.rotation, rotateToDirection, turnSpeed);
+    Quaternion rotate = rotateToDirection;/*Quaternion.Lerp(transform.rotation, rotateToDirection, turnSpeed);*/
     transform.rotation = rotate;
   }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MovementManager : MonoBehaviour {
 	private static MovementManager _instance;
-	private Movement movement;
+	private PlayerInput controls;
 	//public float cameraSensitivity = 1;
 	private Vector2 movementInput;
 	private Vector2 rotationInput;
@@ -26,11 +26,11 @@ public class MovementManager : MonoBehaviour {
 	}
   private void Awake() {
 		_instance = this;
-    movement = new Movement();
+    controls = new PlayerInput();
   }
 
 	private void OnEnable() {
-		movement.Enable();
+		controls.Enable();
 	}
 
   private void Update() {
@@ -45,11 +45,11 @@ public class MovementManager : MonoBehaviour {
   }
 
 	public void UpdatePlayerMovement(float delta) {
-		movementInput = movement.Player.move.ReadValue<Vector2>().normalized * delta;
+		movementInput = controls.movement.move.ReadValue<Vector2>().normalized * delta;
 		moveX = movementInput.x;
 		moveZ = movementInput.y;
 
-		rotationInput = movement.Player.look.ReadValue<Vector2>().normalized * delta;
+		rotationInput = controls.movement.look.ReadValue<Vector2>().normalized * delta;
 		mouseHorizontal = rotationInput.x;
 		mouseVertical = rotationInput.y;
 	}
