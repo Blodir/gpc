@@ -21,6 +21,11 @@ public class PlayerCombat : MonoBehaviour, PlayerInput.ICombatActions
     controls.combat.Enable();
   }
 
+  void Update()
+  {
+    
+  }
+
   public void OnAttack(InputAction.CallbackContext context)
   {
     if (context.phase == InputActionPhase.Started)
