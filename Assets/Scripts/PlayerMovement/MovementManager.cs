@@ -6,7 +6,6 @@ using UnityEngine;
 public class MovementManager : MonoBehaviour {
 	private static MovementManager _instance;
 	private PlayerInput controls;
-	//public float cameraSensitivity = 1;
 	private Vector2 movementInput;
 	private Vector2 rotationInput;
 	public float moveX;
@@ -36,12 +35,6 @@ public class MovementManager : MonoBehaviour {
   private void Update() {
 		delta = Time.deltaTime;
 		UpdatePlayerMovement(delta);
-		//MovePlayer();
-
-		//Quaternion deltaRotation = Quaternion.Euler(-rotationInput.y * cameraSensitivity, rotationInput.x * cameraSensitivity, 0f);
-		//this.transform.localRotation *= deltaRotation;
-		//this.transform.position += deltaPosition * movementSpeed;
-		//this.transform.rotation *= deltaRotation;
   }
 
 	public void UpdatePlayerMovement(float delta) {
