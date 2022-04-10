@@ -616,7 +616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d48f748b315ce73c8faac968a5c01f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraSensitivity: 10
+  cameraSensitivity: 200
   playerTransform: {fileID: 575041137}
   cameraPivotTransform: {fileID: 421056364}
 --- !u!4 &1566875348
@@ -643,7 +643,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 575041140, guid: 99d424c123291d44f95d5b7da94f6341, type: 3}
       propertyPath: m_Constraints
-      value: 116
+      value: 126
       objectReference: {fileID: 0}
     - target: {fileID: 3269747905026045748, guid: 99d424c123291d44f95d5b7da94f6341, type: 3}
       propertyPath: m_Name
@@ -692,6 +692,10 @@ PrefabInstance:
     - target: {fileID: 3269747905026045749, guid: 99d424c123291d44f95d5b7da94f6341, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3269747905026045750, guid: 99d424c123291d44f95d5b7da94f6341, type: 3}
+      propertyPath: moveSpeed
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3269747905026045750, guid: 99d424c123291d44f95d5b7da94f6341, type: 3}
       propertyPath: turnSpeed

@@ -18,8 +18,8 @@ public class PlayerView : MonoBehaviour {
   }
   
   private void RotateCamera(float delta) {
-    horizontalAngle += (MovementManager.Instance.mouseHorizontal * cameraSensitivity);
-    verticalAngle += MovementManager.Instance.mouseVertical * cameraSensitivity;
+    horizontalAngle += MovementManager.Instance.mouseHorizontal * cameraSensitivity;
+    verticalAngle -= MovementManager.Instance.mouseVertical * cameraSensitivity;
 
     Quaternion cameraRotation = Quaternion.Euler(0, horizontalAngle, 0);
     transform.rotation = cameraRotation;
