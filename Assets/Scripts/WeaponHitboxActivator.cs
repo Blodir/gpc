@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class AttackHitbox : MonoBehaviour
+public class WeaponHitboxActivator : MonoBehaviour
 {
   [SerializeField]
   [Tooltip("Set collider to be enabled and disabled by the attack animation")]
@@ -15,7 +14,10 @@ public class AttackHitbox : MonoBehaviour
 
   public void EnableHitbox()
   {
-    col.enabled = true;
+    if (NetworkManager.Singleton.IsServer)
+    {
+      col.enabled = true;
+    }
   }
 
   public void DisableHitbox()

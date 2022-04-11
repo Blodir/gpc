@@ -4,18 +4,22 @@ using UnityEngine;
 public class PlayerCharacter : NetworkBehaviour
 {
   public NetworkVariable<Vector3> position = new NetworkVariable<Vector3>();
-  public NetworkVariable<Vector3> rotation = new NetworkVariable<Vector3>();
   private NetworkVariable<Vector2> movementInput = new NetworkVariable<Vector2>();
 
   [SerializeField]
-  private float movementSpeed = 1f;
+  private float movementUnitsPerSec = 3f;
   [SerializeField]
   private float rotationDegreesPerSec = 360f;
 
   [SerializeField]
+  private float attackDamage = 25f;
+
+  [SerializeField]
   private Animator animator;
   [SerializeField]
-  private float animationDampTime = 0.1f;
+  private float attackAnimationSpeed = 1f;
+  [SerializeField]
+  private float movementAnimationDampTime = 0.1f;
 
   public override void OnNetworkSpawn()
   {
@@ -28,17 +32,53 @@ public class PlayerCharacter : NetworkBehaviour
   }
 
   [ServerRpc]
-  public void PlayerInputServerRpc(Vector2 movement)
+  public void PlayerMovementInputServerRpc(Vector2 movement)
   {
     // input is normalized on server so that players can't cheat by sending large inputs
     movementInput.Value = movement.normalized;
   }
 
-  public void Move(Vector2 movement)
+  [ServerRpc]
+  private void PlayerAttackServerRpc()
+  {
+    BeginAttackAnimation();
+    PlayerAttackClientRpc();
+  }
+
+  [ClientRpc]
+  private void PlayerAttackClientRpc()
+  {
+    BeginAttackAnimation();
+  }
+
+  private void BeginAttackAnimation()
+  {
+    animator.SetFloat("AttackSpeed", attackAnimationSpeed);
+    animator.SetTrigger("Attack");
+  }
+
+  public void Move(Vector2 direction)
   {
     if (IsOwner)
     {
-      PlayerInputServerRpc(movement);
+      PlayerMovementInputServerRpc(direction);
+    }
+  }
+
+  public void Attack()
+  {
+    PlayerAttackServerRpc();
+  }
+
+  public void OnTriggerEnter(Collider col)
+  {
+    if (NetworkManager.Singleton.IsServer)
+    {
+      Health health = col.gameObject.GetComponent<Health>();
+      if (health != null)
+      {
+        health.TakeDamage(attackDamage);
+      }
     }
   }
 
@@ -47,7 +87,7 @@ public class PlayerCharacter : NetworkBehaviour
     // update authoritative position
     if (NetworkManager.Singleton.IsServer)
     {
-      Vector2 mvt = movementInput.Value.normalized * movementSpeed * Time.deltaTime;
+      Vector2 mvt = movementInput.Value.normalized * movementUnitsPerSec * Time.deltaTime;
       position.Value += new Vector3(mvt.x, 0, mvt.y);
     }
 
@@ -67,11 +107,11 @@ public class PlayerCharacter : NetworkBehaviour
     // animate
     if (movementInput.Value.magnitude > 0)
     {
-      animator.SetFloat("Speed", 1f, animationDampTime, Time.deltaTime);
+      animator.SetFloat("Speed", 1f, movementAnimationDampTime, Time.deltaTime);
     }
     else
     {
-      animator.SetFloat("Speed", 0f, animationDampTime, Time.deltaTime);
+      animator.SetFloat("Speed", 0f, movementAnimationDampTime, Time.deltaTime);
     }
   }
 }
