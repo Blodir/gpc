@@ -8,6 +8,8 @@ public class PlayerView : MonoBehaviour {
   public Transform cameraPivotTransform;
   private float horizontalAngle;
   private float verticalAngle;
+  public float minPivot = -40;
+  public float maxPivot = 40;
   private float delta;
     
   private void Update() {
@@ -20,12 +22,16 @@ public class PlayerView : MonoBehaviour {
   private void RotateCamera(float delta) {
     horizontalAngle += MovementManager.Instance.mouseHorizontal * cameraSensitivity;
     verticalAngle -= MovementManager.Instance.mouseVertical * cameraSensitivity;
+    verticalAngle = Mathf.Clamp(verticalAngle, minPivot, maxPivot);
 
     Quaternion cameraRotation = Quaternion.Euler(0, horizontalAngle, 0);
     transform.rotation = cameraRotation;
+    //playerTransform.localRotation = playerTransform.forward * cameraRotation;
+
     cameraRotation = Quaternion.identity;
     cameraRotation = Quaternion.Euler(verticalAngle, 0, 0);
     cameraPivotTransform.localRotation = cameraRotation;
+    
   }
 
   private void CenterToPlayer(float delta) {
