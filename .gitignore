@@ -7,11 +7,11 @@
 /[Oo]bj/
 /[Bb]uild/
 /[Uu]ser/
-/[Uu]ser[Ss]ettings/
+# /[Uu]ser[Ss]ettings/
 
-*.csproj
+# *.csproj
 *.unityproj
-*.sln
+# *.sln
 *.suo
 *.tmp
 *.user
