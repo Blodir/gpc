@@ -37,7 +37,7 @@ namespace NetworkTest
 
         [ServerRpc]
         void MovementServerRpc(Vector2 v) {
-            movementInput.Value = controls.movement.move.ReadValue<Vector2>();
+            movementInput.Value = v;
         }
 
         void Update()
