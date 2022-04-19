@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class Health : NetworkBehaviour
 {
   [SerializeField]
@@ -10,6 +11,13 @@ public class Health : NetworkBehaviour
 
   public override void OnNetworkSpawn()
   {
+    //Check that there is a proper collider
+    Collider col = GetComponent<Collider>();
+    if (col == null || col.isTrigger)
+    {
+      Debug.LogWarning("Health script needs a non-trigger collider on the script holder to work properly!");
+    }
+
     if (NetworkManager.Singleton.IsServer)
     {
       hp.Value = maxHp;
