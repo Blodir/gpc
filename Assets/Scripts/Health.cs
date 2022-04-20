@@ -32,10 +32,10 @@ public class Health : NetworkBehaviour
     Debug.Log($"{gameObject.name} took {damage} damage ({hp.Value} hp left)");
     //Update health bar
     healthBar.SetFill(hp.Value / maxHp);
-    if (hp.Value <= 0f)
-    {
-      Debug.Log($"Oh no, {gameObject.name} died :(");
-      Destroy(gameObject);
-    }
+  }
+
+  public float Current
+  {
+    get { return hp.Value; }
   }
 }

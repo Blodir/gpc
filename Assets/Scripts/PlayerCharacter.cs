@@ -1,5 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerCharacter : NetworkBehaviour
 {
@@ -21,8 +22,15 @@ public class PlayerCharacter : NetworkBehaviour
   [SerializeField]
   private float movementAnimationDampTime = 0.1f;
 
+  [SerializeField]
+  private float despawnAfterSeconds = 5f;
+
+  private bool isDead = false;
+  private Health hlt;
+
   public override void OnNetworkSpawn()
   {
+    hlt = GetComponent<Health>();
     if (NetworkManager.Singleton.IsServer)
     {
       Vector3 randomPosition = new Vector3(Random.Range(-3f, 3f), 0f, Random.Range(-3f, 3f));
@@ -84,6 +92,14 @@ public class PlayerCharacter : NetworkBehaviour
 
   private void Update()
   {
+
+    if (isDead)
+      return;
+    if (hlt.Current <= 0f)
+    {
+      StartCoroutine(Die());
+    }
+
     // update authoritative position
     if (NetworkManager.Singleton.IsServer)
     {
@@ -113,5 +129,13 @@ public class PlayerCharacter : NetworkBehaviour
     {
       animator.SetFloat("Speed", 0f, movementAnimationDampTime, Time.deltaTime);
     }
+  }
+
+  private IEnumerator Die()
+  {
+    isDead = true;
+    animator.SetTrigger("Death");
+    yield return new WaitForSeconds(despawnAfterSeconds);
+    Destroy(gameObject);
   }
 }
