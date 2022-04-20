@@ -23,9 +23,10 @@ public class PlayerCharacter : NetworkBehaviour
   private float movementAnimationDampTime = 0.1f;
 
   [SerializeField]
-  private float despawnAfterSeconds = 5f;
+  private float respawnCooldown = 5f;
 
-  private bool isDead = false;
+  private NetworkVariable<bool> isDead = new NetworkVariable<bool>(false);
+  private bool respawnEnabled = false;
   private Health hlt;
 
   public override void OnNetworkSpawn()
@@ -75,7 +76,40 @@ public class PlayerCharacter : NetworkBehaviour
 
   public void Attack()
   {
-    PlayerAttackServerRpc();
+    if (!isDead.Value)
+      PlayerAttackServerRpc();
+  }
+
+  [ServerRpc]
+  public void RespawnServerRpc()
+  {
+    hlt.ResetHP();
+    isDead.Value = false;
+    RespawnClientRpc();
+  }
+
+  [ClientRpc]
+  public void RespawnClientRpc()
+  {
+    respawnEnabled = false;
+    BeginRespawnAnimation();
+  } 
+
+  public void Respawn()
+  {
+    if (respawnEnabled)
+    {
+      RespawnServerRpc();
+    }
+    else
+    {
+      Debug.Log("Can't respawn right now");
+    }
+  }
+
+  public void BeginRespawnAnimation()
+  {
+    animator.SetBool("Dead", false);
   }
 
   public void OnTriggerEnter(Collider col)
@@ -92,12 +126,14 @@ public class PlayerCharacter : NetworkBehaviour
 
   private void Update()
   {
-
-    if (isDead)
+    //If dead, do not update
+    if (isDead.Value)
       return;
-    if (hlt.Current <= 0f)
+    //Check death conditions
+    if (IsOwner && hlt.Current <= 0f)
     {
-      StartCoroutine(Die());
+      PlayerDeathServerRpc();
+      StartCoroutine(WaitForRespawn());
     }
 
     // update authoritative position
@@ -131,11 +167,32 @@ public class PlayerCharacter : NetworkBehaviour
     }
   }
 
-  private IEnumerator Die()
+  [ServerRpc]
+  public void PlayerDeathServerRpc()
   {
-    isDead = true;
-    animator.SetTrigger("Death");
-    yield return new WaitForSeconds(despawnAfterSeconds);
-    Destroy(gameObject);
+    isDead.Value = true;
+    PlayerDeathClientRpc();
+  } 
+
+  [ClientRpc]
+  public void PlayerDeathClientRpc()
+  {
+    animator.SetBool("Dead", true);
+  }
+
+  private IEnumerator WaitForRespawn()
+  {
+    yield return new WaitForSeconds(respawnCooldown);
+    respawnEnabled = true;
+  }
+
+  void OnGUI()
+  {
+    if (respawnEnabled)
+    {
+      GUILayout.BeginArea(new Rect(Screen.width / 2 - 50, 100, 300, 300));
+      GUILayout.Label("Press 'R' to respawn");
+      GUILayout.EndArea();
+    }
   }
 }

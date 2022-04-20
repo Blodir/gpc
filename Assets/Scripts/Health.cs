@@ -20,10 +20,7 @@ public class Health : NetworkBehaviour
       Debug.LogWarning("Health script needs a non-trigger collider on the script holder to work properly!");
     }
 
-    if (NetworkManager.Singleton.IsServer)
-    {
-      hp.Value = maxHp;
-    }
+    ResetHP();
   }
 
   public void TakeDamage(float damage)
@@ -32,6 +29,16 @@ public class Health : NetworkBehaviour
     Debug.Log($"{gameObject.name} took {damage} damage ({hp.Value} hp left)");
     //Update health bar
     healthBar.SetFill(hp.Value / maxHp);
+  }
+
+  public void ResetHP()
+  {
+    if (NetworkManager.Singleton.IsServer)
+    {
+      Debug.Log("Resetting HP");
+      hp.Value = maxHp;
+      healthBar.SetFill(1f);
+    }
   }
 
   public float Current

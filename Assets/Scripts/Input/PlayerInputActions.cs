@@ -142,6 +142,34 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""pause"",
+            ""id"": ""21ca5e28-ada5-4065-9dcf-31c5e669a5e9"",
+            ""actions"": [
+                {
+                    ""name"": ""respawn"",
+                    ""type"": ""Button"",
+                    ""id"": ""baa7e63d-79ab-42c0-acff-d09c6af45983"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""aa479bec-6361-4fca-8c65-76c6db7ce54a"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""respawn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -153,6 +181,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         // combat
         m_combat = asset.FindActionMap("combat", throwIfNotFound: true);
         m_combat_attack = m_combat.FindAction("attack", throwIfNotFound: true);
+        // pause
+        m_pause = asset.FindActionMap("pause", throwIfNotFound: true);
+        m_pause_respawn = m_pause.FindAction("respawn", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -282,6 +313,39 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         }
     }
     public CombatActions @combat => new CombatActions(this);
+
+    // pause
+    private readonly InputActionMap m_pause;
+    private IPauseActions m_PauseActionsCallbackInterface;
+    private readonly InputAction m_pause_respawn;
+    public struct PauseActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public PauseActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @respawn => m_Wrapper.m_pause_respawn;
+        public InputActionMap Get() { return m_Wrapper.m_pause; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PauseActions set) { return set.Get(); }
+        public void SetCallbacks(IPauseActions instance)
+        {
+            if (m_Wrapper.m_PauseActionsCallbackInterface != null)
+            {
+                @respawn.started -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
+                @respawn.performed -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
+                @respawn.canceled -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
+            }
+            m_Wrapper.m_PauseActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @respawn.started += instance.OnRespawn;
+                @respawn.performed += instance.OnRespawn;
+                @respawn.canceled += instance.OnRespawn;
+            }
+        }
+    }
+    public PauseActions @pause => new PauseActions(this);
     public interface IMovementActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -290,5 +354,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     public interface ICombatActions
     {
         void OnAttack(InputAction.CallbackContext context);
+    }
+    public interface IPauseActions
+    {
+        void OnRespawn(InputAction.CallbackContext context);
     }
 }

@@ -120,6 +120,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "pause",
+            "id": "21ca5e28-ada5-4065-9dcf-31c5e669a5e9",
+            "actions": [
+                {
+                    "name": "respawn",
+                    "type": "Button",
+                    "id": "baa7e63d-79ab-42c0-acff-d09c6af45983",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "aa479bec-6361-4fca-8c65-76c6db7ce54a",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "respawn",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
