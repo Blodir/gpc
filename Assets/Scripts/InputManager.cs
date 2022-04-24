@@ -2,11 +2,12 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, PlayerInputActions.IMovementActions, PlayerInputActions.IPauseActions
+public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, PlayerInputActions.IMovementActions
 {
-  private static InputManager _instance;
+	private static InputManager _instance;
   private PlayerInputActions controls;
   public CameraFocus cameraFocus;
+  private bool inAction;
 
   public static InputManager Instance
   {
@@ -24,7 +25,6 @@ public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, Pla
     controls = new PlayerInputActions();
     controls.movement.SetCallbacks(this);
     controls.combat.SetCallbacks(this);
-    controls.pause.SetCallbacks(this);
     controls.Enable();
   }
 
@@ -39,6 +39,20 @@ public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, Pla
     {
       NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerCharacter>()
         .Attack();
+    }
+  }
+
+  public void OnStrafe(InputAction.CallbackContext context)
+  {
+    if (context.phase == InputActionPhase.Started)
+    {
+      NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerCharacter>()
+        .Strafe(true);
+    }
+    else if (context.phase == InputActionPhase.Canceled)
+    {
+      NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerCharacter>()
+        .Strafe(false);
     }
   }
 
@@ -61,13 +75,5 @@ public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, Pla
     Vector2 rotationInput = controls.movement.look.ReadValue<Vector2>();
     cameraFocus.RotateCamera(new Vector2(-rotationInput.y, rotationInput.x));
     OnMove(); // move direction needs to be adjusted when camera rotation changes
-  }
-
-  public void OnRespawn(InputAction.CallbackContext context)
-  {
-    if (context.phase == InputActionPhase.Started)
-    {
-      NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerCharacter>().Respawn();
-    }
   }
 }

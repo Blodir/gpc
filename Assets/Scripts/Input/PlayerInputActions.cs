@@ -127,6 +127,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""strafe"",
+                    ""type"": ""Button"",
+                    ""id"": ""d80ff50a-3782-4019-90e8-66ddb2c239bd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -140,32 +149,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""action"": ""attack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                }
-            ]
-        },
-        {
-            ""name"": ""pause"",
-            ""id"": ""21ca5e28-ada5-4065-9dcf-31c5e669a5e9"",
-            ""actions"": [
-                {
-                    ""name"": ""respawn"",
-                    ""type"": ""Button"",
-                    ""id"": ""baa7e63d-79ab-42c0-acff-d09c6af45983"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                }
-            ],
-            ""bindings"": [
+                },
                 {
                     ""name"": """",
-                    ""id"": ""aa479bec-6361-4fca-8c65-76c6db7ce54a"",
-                    ""path"": ""<Keyboard>/r"",
+                    ""id"": ""08543f58-cc69-4ad7-8e5c-069120d4809c"",
+                    ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""respawn"",
+                    ""action"": ""strafe"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -181,9 +173,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         // combat
         m_combat = asset.FindActionMap("combat", throwIfNotFound: true);
         m_combat_attack = m_combat.FindAction("attack", throwIfNotFound: true);
-        // pause
-        m_pause = asset.FindActionMap("pause", throwIfNotFound: true);
-        m_pause_respawn = m_pause.FindAction("respawn", throwIfNotFound: true);
+        m_combat_strafe = m_combat.FindAction("strafe", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -285,11 +275,13 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_combat;
     private ICombatActions m_CombatActionsCallbackInterface;
     private readonly InputAction m_combat_attack;
+    private readonly InputAction m_combat_strafe;
     public struct CombatActions
     {
         private @PlayerInputActions m_Wrapper;
         public CombatActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @attack => m_Wrapper.m_combat_attack;
+        public InputAction @strafe => m_Wrapper.m_combat_strafe;
         public InputActionMap Get() { return m_Wrapper.m_combat; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -302,6 +294,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @attack.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
                 @attack.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
                 @attack.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
+                @strafe.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
+                @strafe.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
+                @strafe.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
             }
             m_Wrapper.m_CombatActionsCallbackInterface = instance;
             if (instance != null)
@@ -309,43 +304,13 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @attack.started += instance.OnAttack;
                 @attack.performed += instance.OnAttack;
                 @attack.canceled += instance.OnAttack;
+                @strafe.started += instance.OnStrafe;
+                @strafe.performed += instance.OnStrafe;
+                @strafe.canceled += instance.OnStrafe;
             }
         }
     }
     public CombatActions @combat => new CombatActions(this);
-
-    // pause
-    private readonly InputActionMap m_pause;
-    private IPauseActions m_PauseActionsCallbackInterface;
-    private readonly InputAction m_pause_respawn;
-    public struct PauseActions
-    {
-        private @PlayerInputActions m_Wrapper;
-        public PauseActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
-        public InputAction @respawn => m_Wrapper.m_pause_respawn;
-        public InputActionMap Get() { return m_Wrapper.m_pause; }
-        public void Enable() { Get().Enable(); }
-        public void Disable() { Get().Disable(); }
-        public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(PauseActions set) { return set.Get(); }
-        public void SetCallbacks(IPauseActions instance)
-        {
-            if (m_Wrapper.m_PauseActionsCallbackInterface != null)
-            {
-                @respawn.started -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
-                @respawn.performed -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
-                @respawn.canceled -= m_Wrapper.m_PauseActionsCallbackInterface.OnRespawn;
-            }
-            m_Wrapper.m_PauseActionsCallbackInterface = instance;
-            if (instance != null)
-            {
-                @respawn.started += instance.OnRespawn;
-                @respawn.performed += instance.OnRespawn;
-                @respawn.canceled += instance.OnRespawn;
-            }
-        }
-    }
-    public PauseActions @pause => new PauseActions(this);
     public interface IMovementActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -354,9 +319,6 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     public interface ICombatActions
     {
         void OnAttack(InputAction.CallbackContext context);
-    }
-    public interface IPauseActions
-    {
-        void OnRespawn(InputAction.CallbackContext context);
+        void OnStrafe(InputAction.CallbackContext context);
     }
 }

@@ -1,6 +1,5 @@
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections;
 
 public class PlayerCharacter : NetworkBehaviour
 {
@@ -21,17 +20,20 @@ public class PlayerCharacter : NetworkBehaviour
   private float attackAnimationSpeed = 1f;
   [SerializeField]
   private float movementAnimationDampTime = 0.1f;
+  private bool strafe;
+  private Transform cameraTransform;
+  private Stamina stamina;
+  private float regenerationTimer;
+  public bool playerInAction = false;
 
-  [SerializeField]
-  private float respawnCooldown = 5f;
-
-  private NetworkVariable<bool> isDead = new NetworkVariable<bool>(false);
-  private bool respawnEnabled = false;
-  private Health hlt;
+  private void Awake()
+  {
+    cameraTransform = Camera.main.transform;
+    stamina = this.gameObject.GetComponent<Stamina>();
+  }
 
   public override void OnNetworkSpawn()
   {
-    hlt = GetComponent<Health>();
     if (NetworkManager.Singleton.IsServer)
     {
       Vector3 randomPosition = new Vector3(Random.Range(-3f, 3f), 0f, Random.Range(-3f, 3f));
@@ -54,6 +56,11 @@ public class PlayerCharacter : NetworkBehaviour
     PlayerAttackClientRpc();
   }
 
+  /*private void PlayerStrafeServerRpc()
+  {
+    BeginStrafeAnimation();
+  }*/
+
   [ClientRpc]
   private void PlayerAttackClientRpc()
   {
@@ -66,6 +73,11 @@ public class PlayerCharacter : NetworkBehaviour
     animator.SetTrigger("Attack");
   }
 
+  /*privateStrafeAnimation()
+  {
+    animator.
+  }*/
+
   public void Move(Vector2 direction)
   {
     if (IsOwner)
@@ -76,40 +88,17 @@ public class PlayerCharacter : NetworkBehaviour
 
   public void Attack()
   {
-    if (!isDead.Value)
+    if (stamina.GetStamina() > 0)
+    {
+      stamina.TakeFatigue(20f);
       PlayerAttackServerRpc();
-  }
-
-  [ServerRpc]
-  public void RespawnServerRpc()
-  {
-    hlt.ResetHP();
-    isDead.Value = false;
-    RespawnClientRpc();
-  }
-
-  [ClientRpc]
-  public void RespawnClientRpc()
-  {
-    respawnEnabled = false;
-    BeginRespawnAnimation();
-  } 
-
-  public void Respawn()
-  {
-    if (respawnEnabled)
-    {
-      RespawnServerRpc();
-    }
-    else
-    {
-      Debug.Log("Can't respawn right now");
     }
   }
 
-  public void BeginRespawnAnimation()
+  public void Strafe(bool status)
   {
-    animator.SetBool("Dead", false);
+    //PlayerStrafeServerRpc();
+    strafe = status;
   }
 
   public void OnTriggerEnter(Collider col)
@@ -126,16 +115,6 @@ public class PlayerCharacter : NetworkBehaviour
 
   private void Update()
   {
-    //If dead, do not update
-    if (isDead.Value)
-      return;
-    //Check death conditions
-    if (IsOwner && hlt.Current <= 0f)
-    {
-      PlayerDeathServerRpc();
-      StartCoroutine(WaitForRespawn());
-    }
-
     // update authoritative position
     if (NetworkManager.Singleton.IsServer)
     {
@@ -152,9 +131,19 @@ public class PlayerCharacter : NetworkBehaviour
     {
       newDirection = transform.forward;
     }
-    transform.rotation = Quaternion.RotateTowards(
-      transform.rotation, Quaternion.LookRotation(newDirection), rotationDegreesPerSec * Time.deltaTime
-    );
+    
+    stamina.RegenerateStamina(playerInAction);
+
+    if (!strafe)
+    {
+      transform.rotation = Quaternion.RotateTowards(
+        transform.rotation, Quaternion.LookRotation(newDirection), 
+        rotationDegreesPerSec * Time.deltaTime);
+    }
+    else
+    {
+      transform.rotation = Quaternion.Euler(0, cameraTransform.transform.eulerAngles.y, 0);
+    }
 
     // animate
     if (movementInput.Value.magnitude > 0)
@@ -164,35 +153,6 @@ public class PlayerCharacter : NetworkBehaviour
     else
     {
       animator.SetFloat("Speed", 0f, movementAnimationDampTime, Time.deltaTime);
-    }
-  }
-
-  [ServerRpc]
-  public void PlayerDeathServerRpc()
-  {
-    isDead.Value = true;
-    PlayerDeathClientRpc();
-  } 
-
-  [ClientRpc]
-  public void PlayerDeathClientRpc()
-  {
-    animator.SetBool("Dead", true);
-  }
-
-  private IEnumerator WaitForRespawn()
-  {
-    yield return new WaitForSeconds(respawnCooldown);
-    respawnEnabled = true;
-  }
-
-  void OnGUI()
-  {
-    if (respawnEnabled)
-    {
-      GUILayout.BeginArea(new Rect(Screen.width / 2 - 50, 100, 300, 300));
-      GUILayout.Label("Press 'R' to respawn");
-      GUILayout.EndArea();
     }
   }
 }
