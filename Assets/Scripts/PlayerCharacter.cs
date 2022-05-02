@@ -3,7 +3,20 @@ using UnityEngine;
 
 public class PlayerCharacter : NetworkBehaviour
 {
-  public NetworkVariable<Vector3> position = new NetworkVariable<Vector3>();
+  private Vector3 _serverPosition;
+  private Vector3 serverPosition
+  {
+    get => _serverPosition;
+    set
+    {
+      _serverPosition = value;
+      if (NetworkManager.Singleton.IsServer)
+      {
+        PositionClientRpc(value);
+      }
+    }
+  }
+  private PositionRecord[] clientPositions = {null, null};
   private NetworkVariable<Vector2> movementInput = new NetworkVariable<Vector2>();
 
   [SerializeField]
@@ -38,7 +51,7 @@ public class PlayerCharacter : NetworkBehaviour
     {
       Vector3 randomPosition = new Vector3(Random.Range(-3f, 3f), 0f, Random.Range(-3f, 3f));
       transform.position = randomPosition;
-      position.Value = randomPosition;
+      serverPosition = randomPosition;
     }
   }
 
@@ -60,6 +73,13 @@ public class PlayerCharacter : NetworkBehaviour
   {
     BeginStrafeAnimation();
   }*/
+
+  [ClientRpc]
+  private void PositionClientRpc(Vector3 pos)
+  {
+    clientPositions[1] = clientPositions[0];
+    clientPositions[0] = new PositionRecord(System.DateTime.Now.ToFileTime(), pos);
+  }
 
   [ClientRpc]
   private void PlayerAttackClientRpc()
@@ -119,11 +139,18 @@ public class PlayerCharacter : NetworkBehaviour
     if (NetworkManager.Singleton.IsServer)
     {
       Vector2 mvt = movementInput.Value.normalized * movementUnitsPerSec * Time.deltaTime;
-      position.Value += new Vector3(mvt.x, 0, mvt.y);
+      serverPosition += new Vector3(mvt.x, 0, mvt.y);
     }
 
-    // update local position
-    transform.position = position.Value;
+    if (NetworkManager.Singleton.IsClient && clientPositions[0] != null && clientPositions[1] != null)
+    {
+      long timestep = clientPositions[0].timestamp - clientPositions[1].timestamp;
+      long timeSinceUpdate = System.DateTime.Now.ToFileTime() - clientPositions[0].timestamp;
+      float t = timeSinceUpdate > 0 ? timestep / timeSinceUpdate : 1;
+      UIManager.Instance.debugString = t.ToString();
+      // update local position
+      transform.position = Vector3.Lerp(clientPositions[1].position, clientPositions[0].position, t);
+    }
 
     // update local rotation
     Vector3 newDirection = new Vector3(movementInput.Value.x, 0f, movementInput.Value.y);

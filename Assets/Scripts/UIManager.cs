@@ -6,6 +6,7 @@ public class UIManager : MonoBehaviour
 	private static UIManager _instance;
 
   public string joinCode;
+  public string debugString;
 
   public static UIManager Instance {
 		get {
@@ -37,6 +38,11 @@ public class UIManager : MonoBehaviour
     if (joinCode.Length > 0)
     {
       GUILayout.Label("JoinCode: " + joinCode);
+    }
+
+    if (debugString.Length > 0)
+    {
+      GUILayout.Label("debugString: " + debugString);
     }
 
     GUILayout.Label("Transport: " +

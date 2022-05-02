@@ -35,7 +35,6 @@ public class GPCNetworkManager : MonoBehaviour
     string arg = "";
     for (int i = 0; i < args.Length; i++)
     {
-      Debug.Log("ARG " + i + ": " + args[i]);
       if (args[i] == "-joinCode")
       {
         arg = args[i + 1];
