@@ -30,7 +30,7 @@ public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, Pla
 
   private void Awake()
   {
-		_instance = this;
+	_instance = this;
   }
 
   public void OnAttack(InputAction.CallbackContext context)
@@ -75,5 +75,13 @@ public class InputManager: MonoBehaviour, PlayerInputActions.ICombatActions, Pla
     Vector2 rotationInput = controls.movement.look.ReadValue<Vector2>();
     cameraFocus.RotateCamera(new Vector2(-rotationInput.y, rotationInput.x));
     OnMove(); // move direction needs to be adjusted when camera rotation changes
+  }
+
+  public void OnRespawn(InputAction.CallbackContext context)
+  {
+    if (context.phase == InputActionPhase.Started)
+    {
+      NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerCharacter>().Respawn();
+    }
   }
 }
