@@ -5,6 +5,9 @@ public class UIManager : MonoBehaviour
 {
 	private static UIManager _instance;
 
+  public string joinCode;
+  public string debugString;
+
   public static UIManager Instance {
 		get {
 			if (_instance == null) {
@@ -16,43 +19,31 @@ public class UIManager : MonoBehaviour
 
   private void Awake() {
 		_instance = this;
+    Cursor.visible = false;
   }
 
   void OnGUI()
   {
     GUILayout.BeginArea(new Rect(10, 10, 300, 300));
-    if (!NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-    {
-      StartButtons();
-    }
-    else
-    {
-      StatusLabels();
-    }
+    StatusLabels();
 
     GUILayout.EndArea();
   }
 
-  static void StartButtons()
-  {
-    if (GUILayout.Button("Host"))
-    {
-      NetworkManager.Singleton.StartHost();
-      InputManager.Instance.OnBecomeClient();
-      Cursor.visible = false;
-    }
-    if (GUILayout.Button("Client")){
-      NetworkManager.Singleton.StartClient();
-      InputManager.Instance.OnBecomeClient();
-      Cursor.visible = false;
-    }
-    if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
-  }
-
-  static void StatusLabels()
+  private void StatusLabels()
   {
     var mode = NetworkManager.Singleton.IsHost ?
       "Host" : NetworkManager.Singleton.IsServer ? "Server" : "Client";
+
+    if (joinCode.Length > 0)
+    {
+      GUILayout.Label("JoinCode: " + joinCode);
+    }
+
+    if (debugString.Length > 0)
+    {
+      GUILayout.Label("debugString: " + debugString);
+    }
 
     GUILayout.Label("Transport: " +
       NetworkManager.Singleton.NetworkConfig.NetworkTransport.GetType().Name);

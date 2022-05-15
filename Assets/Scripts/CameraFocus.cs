@@ -29,7 +29,7 @@ public class CameraFocus : MonoBehaviour {
 
   private void Update()
   {
-    if (NetworkManager.Singleton.IsClient)
+    if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.LocalClient.PlayerObject)
     {
       transform.position =
         Vector3.Lerp(

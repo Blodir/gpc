@@ -1,29 +1,48 @@
 using Unity.Netcode;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class Health : NetworkBehaviour
 {
   [SerializeField]
   private float maxHp = 100f;
+  [SerializeField]
+  private HealthBar healthBar;
 
   private NetworkVariable<float> hp = new NetworkVariable<float>();
 
   public override void OnNetworkSpawn()
   {
-    if (NetworkManager.Singleton.IsServer)
+    //Check that there is a proper collider
+    Collider col = GetComponent<Collider>();
+    if (col == null || col.isTrigger)
     {
-      hp.Value = maxHp;
+      Debug.LogWarning("Health script needs a non-trigger collider on the script holder to work properly!");
     }
+
+    ResetHP();
   }
 
   public void TakeDamage(float damage)
   {
     hp.Value -= damage;
     Debug.Log($"{gameObject.name} took {damage} damage ({hp.Value} hp left)");
-    if (hp.Value <= 0f)
+    //Update health bar
+    healthBar.SetFill(hp.Value / maxHp);
+  }
+
+  public void ResetHP()
+  {
+    if (NetworkManager.Singleton.IsServer)
     {
-      Debug.Log($"Oh no, {gameObject.name} died :(");
-      Destroy(gameObject);
+      Debug.Log("Resetting HP");
+      hp.Value = maxHp;
+      healthBar.SetFill(1f);
     }
+  }
+
+  public float Current
+  {
+    get { return hp.Value; }
   }
 }

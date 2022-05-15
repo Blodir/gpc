@@ -127,6 +127,24 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""strafe"",
+                    ""type"": ""Button"",
+                    ""id"": ""d80ff50a-3782-4019-90e8-66ddb2c239bd"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""respawn"",
+                    ""type"": ""Button"",
+                    ""id"": ""8969230d-6dcc-4554-9f1a-b7e9b87cc338"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -138,6 +156,28 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""08543f58-cc69-4ad7-8e5c-069120d4809c"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""strafe"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""26c7eec0-1f80-43b4-97e4-aa118835588a"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""respawn"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -153,6 +193,8 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         // combat
         m_combat = asset.FindActionMap("combat", throwIfNotFound: true);
         m_combat_attack = m_combat.FindAction("attack", throwIfNotFound: true);
+        m_combat_strafe = m_combat.FindAction("strafe", throwIfNotFound: true);
+        m_combat_respawn = m_combat.FindAction("respawn", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -254,11 +296,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_combat;
     private ICombatActions m_CombatActionsCallbackInterface;
     private readonly InputAction m_combat_attack;
+    private readonly InputAction m_combat_strafe;
+    private readonly InputAction m_combat_respawn;
     public struct CombatActions
     {
         private @PlayerInputActions m_Wrapper;
         public CombatActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @attack => m_Wrapper.m_combat_attack;
+        public InputAction @strafe => m_Wrapper.m_combat_strafe;
+        public InputAction @respawn => m_Wrapper.m_combat_respawn;
         public InputActionMap Get() { return m_Wrapper.m_combat; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -271,6 +317,12 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @attack.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
                 @attack.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
                 @attack.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnAttack;
+                @strafe.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
+                @strafe.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
+                @strafe.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnStrafe;
+                @respawn.started -= m_Wrapper.m_CombatActionsCallbackInterface.OnRespawn;
+                @respawn.performed -= m_Wrapper.m_CombatActionsCallbackInterface.OnRespawn;
+                @respawn.canceled -= m_Wrapper.m_CombatActionsCallbackInterface.OnRespawn;
             }
             m_Wrapper.m_CombatActionsCallbackInterface = instance;
             if (instance != null)
@@ -278,6 +330,12 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @attack.started += instance.OnAttack;
                 @attack.performed += instance.OnAttack;
                 @attack.canceled += instance.OnAttack;
+                @strafe.started += instance.OnStrafe;
+                @strafe.performed += instance.OnStrafe;
+                @strafe.canceled += instance.OnStrafe;
+                @respawn.started += instance.OnRespawn;
+                @respawn.performed += instance.OnRespawn;
+                @respawn.canceled += instance.OnRespawn;
             }
         }
     }
@@ -290,5 +348,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     public interface ICombatActions
     {
         void OnAttack(InputAction.CallbackContext context);
+        void OnStrafe(InputAction.CallbackContext context);
+        void OnRespawn(InputAction.CallbackContext context);
     }
 }
